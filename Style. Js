@@ -1,0 +1,40 @@
+const searchBtn = document.getElementById("searchBtn");
+const searchInput = document.getElementById("searchInput");
+const recipeContainer = document.getElementById("recipeContainer");
+
+searchBtn.addEventListener("click", () => {
+    const recipe = searchInput.value.trim();
+
+    if (recipe === "") {
+        alert("Please enter a recipe name");
+        return;
+    }
+
+    fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${recipe}`)
+        .then(response => response.json())
+        .then(data => {
+            recipeContainer.innerHTML = "";
+
+            if (!data.meals) {
+                recipeContainer.innerHTML = "<h2>No recipes found!</h2>";
+                return;
+            }
+
+            data.meals.forEach(meal => {
+                recipeContainer.innerHTML += `
+                    <div class="recipe-card">
+                        <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+                        <h3>${meal.strMeal}</h3>
+                        <p>${meal.strCategory}</p>
+                        <a href="${meal.strYoutube}" target="_blank">
+                            View Recipe
+                        </a>
+                    </div>
+                `;
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            recipeContainer.innerHTML = "<h2>Error loading recipes</h2>";
+        });
+});
